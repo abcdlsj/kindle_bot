@@ -65,7 +65,7 @@ func (k *Bot) SetHandler() error {
 	if debugTrace {
 		k.Backend.Use(middleware.Logger())
 	}
-	k.Backend.Use(checkSender([]int64{1086106057}...)) // MASK: [match] [1086106057]
+	k.Backend.Use(checkSender([]int64{******}...)) // MASK_DONE
 	k.Backend.Handle(tele.OnText, k.StateHandler)
 	k.Backend.Handle("/start", k.StartHandler)
 	k.Backend.Handle("/history", k.HistoryHandler)
@@ -75,7 +75,7 @@ func (k *Bot) SetHandler() error {
 
 func NewBot() (*Bot, error) {
 	bot, err := tele.NewBot(tele.Settings{
-		Token:  "5682917636:AAHfS-J1VrIGzlyh3jQbya4zcW7fZ5QL7n4", // MASK: [match] [5682917636:AAHfS-J1VrIGzlyh3jQbya4zcW7fZ5QL7n4]
+		Token:  "******", // MASK_DONE
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	})
 	if err != nil {
@@ -186,8 +186,8 @@ func (k *Bot) SendFileHandler(c tele.Context) error {
 func (k *Bot) SendAttachment(fileName string, fileBody io.Reader) (err error) {
 	buf := new(bytes.Buffer)
 	w := multipart.NewWriter(buf)
-	err = w.WriteField("apiUser", "sc_17bmkf_test_Tw1JWU")           // MASK: [match] [sc_17bmkf_test_Tw1JWU]
-	err = w.WriteField("apiKey", "ee3fff72f233894d6cdadec38c010bac") // MASK: [match] [ee3fff72f233894d6cdadec38c010bac]
+	err = w.WriteField("apiUser", "******")           // MASK_DONE
+	err = w.WriteField("apiKey", "******") // MASK_DONE
 	err = w.WriteField("to", k.Cfg.KindleEmail)
 	err = w.WriteField("from", "service@sendcloud.im")
 	err = w.WriteField("fromName", "@KindleBurningBot")
