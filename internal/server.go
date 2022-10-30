@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -38,6 +39,11 @@ var GlobalUserState = UserState{
 }
 
 func init() {
+	logFile, err := os.Create("output.log")
+	if err != nil {
+		panic(err)
+	}
+	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetReportCaller(true)
 }
@@ -183,7 +189,7 @@ func (k *Bot) SendAttachment(fileName string, fileBody io.Reader) (err error) {
 	err = w.WriteField("apiUser", "******")           // MASK_DONE
 	err = w.WriteField("apiKey", "******") // MASK_DONE
 	err = w.WriteField("to", k.Cfg.KindleEmail)
-	err = w.WriteField("from", "******") // MASK_DONE
+	err = w.WriteField("from", "service@sendcloud.im")
 	err = w.WriteField("fromName", "@KindleBurningBot")
 	err = w.WriteField("subject", "Kindle Document")
 	err = w.WriteField("html", "Kindle Document")
