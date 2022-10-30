@@ -3,16 +3,17 @@ package internal
 import (
 	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	tele "gopkg.in/telebot.v3"
-	"gopkg.in/telebot.v3/middleware"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	tele "gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v3/middleware"
 )
 
 const (
@@ -39,7 +40,6 @@ var GlobalUserState = UserState{
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetReportCaller(true)
-	// init config
 }
 
 type Bot struct {
@@ -88,8 +88,7 @@ func checkSender(chats ...int64) tele.MiddlewareFunc {
 			Chats: chats,
 			In:    next,
 			Out: func(c tele.Context) error {
-				//_, _ = c.Bot().Send(c.Sender(), fmt.Sprintf("you can not use this bot, pls contact admin")) // TODO: why use c.Send() can't receive message?
-				_ = c.Send(fmt.Sprintf("you can not use this bot, pls contact admin"))
+				_ = c.Send("you can not use this bot, pls contact admin")
 				if debugTrace {
 					log.Errorf("user %d try to use bot, but whitlist chats: [%+v]", c.Sender().ID, chats)
 				}
@@ -116,7 +115,7 @@ func (k *Bot) StateHandler(c tele.Context) error {
 		_, _ = k.Backend.Send(c.Sender(), fmt.Sprintf("set kindle email to %s", k.Cfg.KindleEmail))
 		setUserState(c.Sender().ID, OnStart)
 	default:
-		_, _ = k.Backend.Send(c.Sender(), fmt.Sprintf("pls send file to me\nif you want to change email, pls use /start"))
+		_, _ = k.Backend.Send(c.Sender(), "pls send file to me\nif you want to change email, pls use /start")
 	}
 
 	return nil
@@ -143,7 +142,8 @@ func (k *Bot) SendFileHandler(c tele.Context) error {
 	doc := c.Message().Document
 	// check data is in kindle supported format: mobi, epub, azw3, pdf
 	if doc.InCloud() {
-		fileName, fileType := doc.FileName, doc.MIME
+		var fileName, fileType string
+		fileName, fileType = doc.FileName, ""
 		sl := strings.Split(fileName, ".")
 		if sl == nil || len(sl) < 2 {
 			_, _ = k.Backend.Send(c.Sender(), "file format not supported")
